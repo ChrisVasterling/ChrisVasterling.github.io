@@ -1,0 +1,33 @@
+{
+  "name": "chrisvasterling.github.io",
+  "version": "0.1.0",
+  "description": "Personal website for Christopher Vasterling",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rm build/*.map build/main.js build/main.css",
+    "build": "npm run clean & esbuild --bundle --minify --target=es6 --outdir=build index.tsx",
+    "build:dev": "npm run clean & esbuild --watch --bundle --sourcemap --target=es6 --outdir=build index.tsx --servedir=build",
+    "deploy": "gh-pages --dist build --branch gh-pages --message \"Deploy to gh-pages\""
+  },
+  "author": "Christopher Vasterling",
+  "license": "ISC",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "esbuild": "^0.18.17",
+    "eslint": "^8.45.0",
+    "eslint-config-standard-with-typescript": "^37.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^16.0.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.33.0",
+    "gh-pages": "^5.0.0",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "@types/react": "^18.2.17",
+    "@types/react-dom": "^18.2.7",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
