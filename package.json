@@ -5,10 +5,10 @@
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "rm build/*.map build/main.js build/main.css",
-    "build": "npm run clean & esbuild --bundle --minify --target=es6 --outdir=build index.tsx",
-    "build:dev": "npm run clean & esbuild --watch --bundle --sourcemap --target=es6 --outdir=build index.tsx --servedir=build",
-    "deploy": "gh-pages --dist build --branch gh-pages --message \"Deploy to gh-pages\""
+    "clean": "rm build/*.map build/index.js build/index.css",
+    "build": "npm run clean & esbuild --bundle --target=es6 --outdir=build index.tsx --minify",
+    "build:dev": "npm run clean & esbuild --bundle  --target=es6 --outdir=build index.tsx --watch --sourcemap --servedir=build",
+    "deploy": "npm run build & gh-pages --dist build --branch gh-pages --message \"Deploy to gh-pages\""
   },
   "author": "Christopher Vasterling",
   "license": "ISC",
