@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
-    Custom 404 Page
+    <script>
+      // Performs a redirect: .io/example -> .io/#/example
+      // does not consider an url parameters
+      window.location.replace(window.location.origin + "/#" + window.location.pathname)
+    </script>
   </body>
 </html>
