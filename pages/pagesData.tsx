@@ -38,7 +38,6 @@ const pagesData = [
       <Link to={"/projects/12345"}>Link to Project 12345</Link>
       <br />
       <Link to={"./67890"}>Link to Project 67890</Link>
-
     </>
   },
   {

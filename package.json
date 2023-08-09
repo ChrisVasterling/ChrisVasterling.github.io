@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm build/*.map build/index.js build/index.css",
     "build": "npm run clean & esbuild --bundle --target=es6 --outdir=build index.tsx --minify",
-    "build:dev": "npm run clean & esbuild --bundle  --target=es6 --outdir=build index.tsx --watch --sourcemap --servedir=build",
+    "build:dev": "npm run clean & esbuild --bundle  --target=es6 --outdir=build index.tsx --watch --sourcemap --servedir=build --serve-fallback=build/404.html",
     "deploy": "npm run build & gh-pages --dist build --branch gh-pages --message \"Deploy to gh-pages\""
   },
   "author": "Christopher Vasterling",
@@ -25,6 +25,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.1",
     "@types/react": "^18.2.17",
     "@types/react-dom": "^18.2.7",
     "react": "^18.2.0",
