@@ -1,7 +1,7 @@
 import React from 'react'
 import { HashRouter } from 'react-router-dom'
 import Router from '../pages/router'
-import PrimaryButton from './PrimaryButton'
+import Button from './Button'
 
 export default function App (props: any): JSX.Element {
   return (
@@ -9,7 +9,10 @@ export default function App (props: any): JSX.Element {
       <h1>⚠️Under Construction⚠️</h1>
       <span>- Chris Vasterling</span>
       <hr />
-      <PrimaryButton />
+      {/* Quick / Dirty Linking */}
+      <a href="./about">
+        <Button>About</Button>
+      </a>
       <br />
       <HashRouter>
         <Router />
