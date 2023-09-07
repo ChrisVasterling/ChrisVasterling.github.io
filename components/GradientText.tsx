@@ -4,11 +4,12 @@ import { Box, SxProps } from '@mui/material'
 export interface IGradientText {
   children: string,
   gradient: string,
-  styles?: SxProps
+  styles?: SxProps,
+  enableShadow?: boolean
 }
 
 export default function GradientText(props: IGradientText): JSX.Element {
-  const {gradient, styles} = props
+  const {gradient, styles, enableShadow} = props
   return (
     <Box 
       sx={{
@@ -16,7 +17,7 @@ export default function GradientText(props: IGradientText): JSX.Element {
         backgroundClip: "text",
         color: "transparent",
         display: "inline-block",
-        filter: "drop-shadow(-1px 1px 4px rgba(0, 0, 0, .4))",
+        filter: enableShadow ? "drop-shadow(-1px 1px 4px rgba(0, 0, 0, .4))" : "",
         ...styles
       }}
     >

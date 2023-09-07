@@ -1,11 +1,15 @@
 import { Box, SxProps } from '@mui/material'
 import React from 'react'
 
-export interface IGradientBox {
-  children: JSX.Element | JSX.Element[] | string,
+
+interface IGradientBoxChildren {
+  children: JSX.Element | JSX.Element[] | string
+}
+
+export interface IGradientBoxStyle {
   innerStyles?: SxProps,
   outerStyles?: SxProps,
-  gradient: string,
+  gradient?: string,
   borderRadius?: number,
   borderWidth?: number,
   padding?: number,
@@ -18,7 +22,7 @@ export interface IGradientBox {
  * 
  * Any style can be overridden using the innerStyles or outerStyles props
  */
-export default function GradientBox(props: IGradientBox): JSX.Element {
+export default function GradientBox(props: IGradientBoxStyle & IGradientBoxChildren): JSX.Element {
   // So long as borderWidth is less than borderRadius, the inside will have rounded borders
   const {
     gradient,

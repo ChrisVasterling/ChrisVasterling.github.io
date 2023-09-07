@@ -21,6 +21,7 @@ export default function (props: any): JSX.Element {
         <span> Just a </span>
         <GradientText
           gradient={"linear-gradient(90deg, #fee3c5, #f2c280, #935f37, #5e3413, #bb6436)"}
+          enableShadow
           styles={{
             fontFamily: 'Permanent Marker'
           }}
@@ -30,6 +31,7 @@ export default function (props: any): JSX.Element {
         <span> on </span>
         <GradientText
           gradient={"linear-gradient(90deg, #f2d880, #2e479f, #40af56)"}
+          enableShadow
           styles={{
             fontFamily: 'Permanent Marker'
           }}

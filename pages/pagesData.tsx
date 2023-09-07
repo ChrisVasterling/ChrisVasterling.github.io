@@ -1,6 +1,7 @@
 import React from 'react'
 import About from './About'
 import { Link, useParams } from 'react-router-dom'
+import Home from './Home'
 
 // TEMPORARY for basic route testing
 function TestEle (props: any): JSX.Element {
@@ -17,7 +18,7 @@ const pagesData = [
   {
     path: "",
     title: "home",
-    element: <span>Home</span>
+    element: <Home />
   },
   {
     path: "about",
