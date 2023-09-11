@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import GradientBox, { IGradientBoxStyle } from './GradientBox'
+// import GradientBox, { IGradientBoxStyle } from './GradientBox'
 import { Box, SxProps } from '@mui/material'
+import GradientBox, { IGradientBoxOptional }  from './GradientBox'
 
 export enum ButtonTypes {
   Primary,
@@ -11,7 +12,7 @@ export interface IButton {
   children: JSX.Element | JSX.Element[] | string,
   type?: ButtonTypes,
   background?: string,
-  propsGB?: IGradientBoxStyle // Manually change optional props
+  propsGB?: IGradientBoxOptional // Manually change optional props
   onClick?: () => void,
   onMouseOver?: () => void
 }
@@ -39,21 +40,16 @@ export default function Button(props: IButton): JSX.Element {
       }}
     >
       <GradientBox
-        gradient={background ?? "lightgray"}
-        padding={10}
-        borderWidth={4}
-        borderRadius={10}
+        gradient={background ?? "linear-gradient(lightgrey, lightgrey)"}
+        styles={{
+          padding: "10px",
+          borderWidth: 4,
+          borderRadius: 10
+        }}
         {...propsGB}
-        innerStyles={{
-          backgroundColor: defaultBKColor,
-          ...propsGB?.innerStyles
-        }}
-        outerStyles={{
-          ...propsGB?.outerStyles
-        }}
       >
-      {props.children}
-    </GradientBox>
+        {props.children}
+      </GradientBox>
     </Box>
   )
 }

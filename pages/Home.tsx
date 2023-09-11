@@ -34,20 +34,20 @@ export default function Home(props: any) {
           )
           `
         }
+        
         propsGB={{
-          innerStyles: {
-            color: "red"
-          },
-          borderWidth: 5,
-          borderRadius: 10,
-          padding: 50,
+          styles: {
+            borderWidth: 5,
+            borderRadius: 10,
+            padding: "50px",
+          }
         }}
         
         onClick={() => {
           navigate('/projects')
         }}
       >
-        Special Button (/projects)
+        <span style={{color: "red"}}>Special Button (/projects)</span>
       </Button>
       <br />
     </>
