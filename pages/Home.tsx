@@ -14,6 +14,9 @@ export default function Home(props: any) {
       <Button
         background={"linear-gradient(45deg, purple, blue)"}
         type={ButtonTypes.Secondary}
+        styles={{
+          padding: "10px",
+        }}
         onClick={() => {
           navigate("/about")
         }}
@@ -35,14 +38,17 @@ export default function Home(props: any) {
           `
         }
         
-        propsGB={{
+        GBOptional={{
           styles: {
-            borderWidth: 5,
-            borderRadius: 10,
-            padding: "50px",
+            borderWidth: 10,
+            borderRadius: 50,
           }
         }}
         
+        styles={{
+          padding: "50px",
+        }}
+
         onClick={() => {
           navigate('/projects')
         }}

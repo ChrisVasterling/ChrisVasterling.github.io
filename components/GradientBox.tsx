@@ -10,8 +10,8 @@ interface IGradientBoxRequired {
 // Comes from https://stackoverflow.com/questions/41285211/overriding-interface-property-type-defined-in-typescript-d-ts-file
 type Modify<T, R> = Omit<T, keyof R> & R;
 type GBCssProperties = Modify<CSSProperties, {
-  borderRadius: number | number[],
-  borderWidth: number | number[]
+  borderRadius?: number | number[],
+  borderWidth?: number | number[]
 }>
 
 export interface IGradientBoxOptional {
@@ -88,12 +88,12 @@ export default function GradientBox(props: IGradientBoxOptional & IGradientBoxRe
           borderLeftWidth: borderWidths[3] + "px",
           position: "relative",
           height: "100%",
-          width: "100%"
+          width: "100%",
+          background: styles?.background,
+          backgroundSize: backgroundSize[0] + "px " + backgroundSize[1] + "px",
         }}
       >
-        <Box sx={{
-          padding: styles?.padding ?? "0px",
-        }}>
+        <Box>
           {props.children}
         </Box>
         {/* Only display when the box dimmensions are available */}
