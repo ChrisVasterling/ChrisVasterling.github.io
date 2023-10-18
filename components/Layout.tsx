@@ -72,7 +72,7 @@ export default function Layout (props: any): JSX.Element {
               type={ButtonTypes.Secondary}
               background="linear-gradient(red, red)"
               gradientBoxStyles={{
-                borderRadius: 16.5
+                borderRadius: 10
               }}
             >
               About

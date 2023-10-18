@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { createContext, useState } from 'react';
 import { HashRouter } from 'react-router-dom';
 import Router from '../../pages/router';
 import Layout from '../Layout';
 import './App.css';
+
+export const HeaderHeightContext = createContext(0);
 
 export default function App (props: any): JSX.Element {
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -11,11 +13,9 @@ export default function App (props: any): JSX.Element {
     <>
       <HashRouter>
         <Layout onHeaderHeight={setHeaderHeight}/>
-        <div style={{
-          paddingTop: `${headerHeight}px`
-        }}>
+        <HeaderHeightContext.Provider value={headerHeight}>
           <Router />
-        </div>
+        </HeaderHeightContext.Provider>
       </HashRouter>
     </>
   );

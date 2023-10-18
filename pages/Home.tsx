@@ -1,12 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button, { ButtonTypes } from '../components/Button';
+import HeaderSpacing from '../components/HeaderSpacing';
 
 export default function Home (props: any): JSX.Element {
   const navigate = useNavigate();
 
   return (
     <>
+      <HeaderSpacing />
       <h1>⚠️Under Construction⚠️</h1>
       <span>- Chris Vasterling</span>
       <hr />

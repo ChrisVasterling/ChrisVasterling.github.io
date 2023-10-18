@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import GradientText from '../components/GradientText';
+import HeaderSpacing from '../components/HeaderSpacing';
 
 export default function About (props: any): JSX.Element {
   return (
     <>
+      <HeaderSpacing />
       <Link to={'/projects'}>Link to Projects</Link>
 
       <link rel="preconnect" href="https://fonts.googleapis.com" />
