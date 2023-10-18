@@ -1,24 +1,23 @@
-import React from "react"
-import { useNavigate } from 'react-router-dom'
-import Button, { ButtonTypes } from "../components/Button"
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import Button, { ButtonTypes } from '../components/Button';
 
-export default function Home(props: any) {
-
+export default function Home (props: any): JSX.Element {
   const navigate = useNavigate();
- 
+
   return (
     <>
       <h1>⚠️Under Construction⚠️</h1>
       <span>- Chris Vasterling</span>
       <hr />
       <Button
-        background={"linear-gradient(45deg, purple, blue)"}
+        background={'linear-gradient(45deg, purple, blue)'}
         type={ButtonTypes.Secondary}
         styles={{
-          padding: "10px",
+          padding: '10px'
         }}
         onClick={() => {
-          navigate("/about")
+          navigate('/about');
         }}
       >
         About
@@ -37,25 +36,25 @@ export default function Home(props: any) {
           )
           `
         }
-        
-        GBOptional={{
-          styles: {
-            borderWidth: 10,
-            borderRadius: 50,
-          }
+
+        gradientBoxStyles={{
+          borderWidth: 10,
+          borderRadius: 50
         }}
-        
+
         styles={{
-          padding: "50px",
+          padding: '50px'
         }}
 
         onClick={() => {
-          navigate('/projects')
+          navigate('/projects');
         }}
       >
-        <span style={{color: "red"}}>Special Button (/projects)</span>
+        <span style={{ color: 'red' }}>Special Button (/projects)</span>
       </Button>
-      <br />
+      <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+      <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+      <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
     </>
-  )
+  );
 }
