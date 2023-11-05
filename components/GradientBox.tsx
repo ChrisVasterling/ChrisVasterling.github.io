@@ -107,6 +107,28 @@ export default function GradientBox (props: IGradientBoxOptional & IGradientBoxR
     );
   };
 
+  const handleWindowResize = (event: Event): void => {
+    // box contents may have wrapped on a window resize
+    if (container.current !== undefined) {
+      if (container.current.offsetWidth !== backgroundSize[0] ||
+          container.current.offsetHeight !== backgroundSize[1]) {
+        // As a result of resize, one of the dimensions changed so update it
+        setBackgroundSize([
+          container.current.offsetWidth,
+          container.current.offsetHeight
+        ]);
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('resize', handleWindowResize);
+
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, [handleWindowResize]);
+
   const borderRadiuses = NormalizeToArray(styles?.borderRadius ?? 0, 4);
   const borderWidths = NormalizeToArray(styles?.borderWidth ?? 0, 4);
   const innerRadiuses = borderRadiuses.map((radius: number, index: number) => {
@@ -176,48 +198,6 @@ export default function GradientBox (props: IGradientBoxOptional & IGradientBoxR
                 />
               );
             })}
-            {/* Top Left */}
-            <GradientBoxInnerCorner
-              background={gradient}
-              innerRadius={innerRadiuses[0]}
-              minBackgroundDimension={minBackgroundDimension}
-              backgroundSize={backgroundSize}
-              borderWidths={borderWidths}
-              position='TL'
-              hidden={HideInnerRadius(0)}
-            />
-            {/* Top Right */}
-            <GradientBoxInnerCorner
-              background={gradient}
-              innerRadius={innerRadiuses[1]}
-              minBackgroundDimension={minBackgroundDimension}
-              backgroundSize={backgroundSize}
-              borderWidths={borderWidths}
-              position='TR'
-              hidden={HideInnerRadius(1)}
-            />
-
-            {/* Bottom Right */}
-            <GradientBoxInnerCorner
-              background={gradient}
-              innerRadius={innerRadiuses[2]}
-              minBackgroundDimension={minBackgroundDimension}
-              backgroundSize={backgroundSize}
-              borderWidths={borderWidths}
-              position='BR'
-              hidden={HideInnerRadius(2)}
-            />
-
-            {/* Bottom Left */}
-            <GradientBoxInnerCorner
-              background={gradient}
-              innerRadius={innerRadiuses[3]}
-              minBackgroundDimension={minBackgroundDimension}
-              backgroundSize={backgroundSize}
-              borderWidths={borderWidths}
-              position='BL'
-              hidden={HideInnerRadius(3)}
-            />
           </Box>
         )}
       </Box>

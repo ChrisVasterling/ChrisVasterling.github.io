@@ -3,11 +3,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import Button, { ButtonTypes } from './Button';
 import { Box, Stack } from '@mui/material';
 import GradientText from './GradientText';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function Layout (props: any): JSX.Element {
   const headerRef = useRef<HTMLDivElement>(null);
   const [scrollAtTop, setScrollAtTop] = useState<boolean>(true);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleWindowScroll = (): void => {
     setScrollAtTop(window.scrollY === 0);
@@ -21,7 +23,7 @@ export default function Layout (props: any): JSX.Element {
 
   window.addEventListener('scroll', handleWindowScroll);
   // Disable the layout on specific pages
-  // let location = useLocation();
+  // const location = useLocation();
   // if (location.pathname == "/about") {
   //   return <></>
   // }
@@ -51,6 +53,30 @@ export default function Layout (props: any): JSX.Element {
             alignItems: 'center'
           }}
         >
+          {location.pathname !== '/' && (
+              <Button
+                type={ButtonTypes.Primary}
+                onClick={() => {
+                  navigate('/');
+                }}
+                background="linear-gradient(37deg, red, blue)"
+                styles={{
+                  padding: '3px',
+                  fontFamily: 'sans-serif',
+                  fontSize: '.9em',
+                  userSelect: 'none',
+                  color: 'white'
+                }}
+                gradientBoxStyles={{
+                  borderRadius: 7
+                }}
+                containerStyles={{
+                  marginRight: '10px'
+                }}
+              >
+                Home
+              </Button>
+          )}
           <GradientText
             gradient="black"
             styles={{
@@ -69,8 +95,18 @@ export default function Layout (props: any): JSX.Element {
             }}
           >
             <Button
-              type={ButtonTypes.Secondary}
-              background="linear-gradient(red, red)"
+              type={ButtonTypes.Primary}
+              onClick={() => {
+                navigate('/about');
+              }}
+              background="linear-gradient(37deg, red, blue)"
+              styles={{
+                padding: '10px',
+                fontFamily: 'sans-serif',
+                fontSize: '1.2em',
+                userSelect: 'none',
+                color: 'white'
+              }}
               gradientBoxStyles={{
                 borderRadius: 10
               }}
@@ -78,7 +114,21 @@ export default function Layout (props: any): JSX.Element {
               About
             </Button>
             <Button
-              type={ButtonTypes.Secondary}
+              type={ButtonTypes.Primary}
+              onClick={() => {
+                navigate('/projects');
+              }}
+              background="linear-gradient(37deg, red, blue)"
+              styles={{
+                padding: '10px',
+                fontFamily: 'sans-serif',
+                fontSize: '1.2em',
+                userSelect: 'none',
+                color: 'white'
+              }}
+              gradientBoxStyles={{
+                borderRadius: 10
+              }}
             >
               Projects
             </Button>

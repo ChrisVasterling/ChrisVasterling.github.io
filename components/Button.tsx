@@ -1,8 +1,8 @@
 import React, { type CSSProperties, useRef } from 'react';
 // import GradientBox, { IGradientBoxStyle } from './GradientBox'
-import { Box, ButtonBase, useTheme } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import GradientBox, { type IGradientBoxOptional } from './GradientBox';
-import { type TouchRippleActions } from '@mui/material/ButtonBase/TouchRipple';
+import TouchRipple, { type TouchRippleActions } from '@mui/material/ButtonBase/TouchRipple';
 
 export enum ButtonTypes {
   Primary,
@@ -15,12 +15,13 @@ export interface IButton {
   background?: string
   gradientBoxStyles?: IGradientBoxOptional['styles'] // Manually change styles on gradient box
   styles?: CSSProperties
+  containerStyles?: CSSProperties
   onClick?: () => void
   onMouseOver?: () => void
 }
 
 export default function Button (props: IButton): JSX.Element {
-  const { type, background, gradientBoxStyles, styles } = props;
+  const { type, background, gradientBoxStyles, styles, containerStyles } = props;
 
   const touchRippleRef = useRef<TouchRippleActions>(null);
   const theme = useTheme();
@@ -60,11 +61,18 @@ export default function Button (props: IButton): JSX.Element {
         void t();
       }}
       onMouseOver={props.onMouseOver}
+      onMouseOut={(e) => {
+        const t = async (): Promise<void> => {
+          await handleRippleStop(e);
+        };
+        void t();
+      }}
       sx={{
         margin: 0,
         padding: 0,
         display: 'inline-block',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        ...containerStyles
       }}
     >
       <GradientBox
@@ -76,19 +84,25 @@ export default function Button (props: IButton): JSX.Element {
           ...gradientBoxStyles
         }}
       >
-        <ButtonBase
+        <Box
           sx={{
-            display: 'block',
+            display: 'inline-block',
             padding: '5px', // default value
             '&& .MuiTouchRipple-rippleVisible': {
               animationDuration: `${rippleDuration}ms`
             },
+            // '&& .MuiTouchRipple-child': {
+            //   backgroundClip: 'unset',
+            //   background
+            // },
             ...styles
           }}
-          touchRippleRef={touchRippleRef}
         >
-          {props.children}
-        </ButtonBase>
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            {props.children}
+          </div>
+          <TouchRipple ref={touchRippleRef} />
+        </Box>
       </GradientBox>
     </Box>
   );
