@@ -1,5 +1,5 @@
 import { Box, styled } from '@mui/material';
-import React, { type CSSProperties, useEffect, useRef, useState, useMemo } from 'react';
+import React, { type CSSProperties, useEffect, useRef, useState, memo } from 'react';
 
 interface IGradientBoxRequired {
   children: JSX.Element | JSX.Element[] | string
@@ -17,7 +17,7 @@ export interface IGradientBoxOptional {
   styles?: GradientBoxCssProperties
 }
 
-function GradientBoxInnerCorner (props: {
+interface IGradientBoxInnerCorner {
   innerRadius: number
   minBackgroundDimension: number
   background: string
@@ -25,7 +25,10 @@ function GradientBoxInnerCorner (props: {
   borderWidths: number[]
   hidden: boolean
   position: string | 'TL' | 'TR' | 'BR' | 'BL'
-}): JSX.Element {
+  [key: string]: any
+}
+
+const GradientBoxInnerCorner = memo(function GradientBoxInnerCorner (props: IGradientBoxInnerCorner): JSX.Element {
   const { innerRadius, minBackgroundDimension, background, backgroundSize, borderWidths, hidden, position } = props;
 
   let cornerSpecificProps: CSSProperties;
@@ -61,29 +64,19 @@ function GradientBoxInnerCorner (props: {
     return <></>;
   }
 
-  // If props aren't changing, use a cached version of a corner
-  const Corner = useMemo(
-    () => {
-      // When the component is resized, maintain the same emotion class name for unchanging styles
-      return (
-        styled('div', {
-          // pass all props to the div
-          shouldForwardProp: () => true
-        })({
-          width: `${innerRadius}px`,
-          height: `${innerRadius}px`,
-          maxWidth: `${minBackgroundDimension / 2}px`,
-          maxHeight: `${minBackgroundDimension / 2}px`,
-          background,
-          position: 'absolute',
-          visibility: hidden ? 'hidden' : 'visible',
-          ...cornerSpecificProps
-        })
-      );
-    },
-    // Only generate new Corner if these specific prop values change
-    [innerRadius, minBackgroundDimension, hidden, background]
-  );
+  const Corner = styled('div', {
+    // pass all props to the div
+    shouldForwardProp: () => true
+  })({
+    width: `${innerRadius}px`,
+    height: `${innerRadius}px`,
+    maxWidth: `${minBackgroundDimension / 2}px`,
+    maxHeight: `${minBackgroundDimension / 2}px`,
+    background,
+    position: 'absolute',
+    visibility: hidden ? 'hidden' : 'visible',
+    ...cornerSpecificProps
+  });
 
   return (
     <Corner
@@ -108,7 +101,32 @@ function GradientBoxInnerCorner (props: {
   //     ...cornerSpecificProps
   //   }}/>
   // );
-}
+}, (oldProps: IGradientBoxInnerCorner, newProps: IGradientBoxInnerCorner) => {
+  // If props aren't changing, use a memoized version of a corner
+  // return true if the same, false if different
+  let same = true;
+
+  const keys = Object.keys(oldProps);
+  for (let i = 0; i < keys.length; i++) {
+    if (Array.isArray(oldProps[keys[i]])) {
+      // compare arrays
+      for (let k = 0; k < oldProps[keys[i]].length && same; k++) {
+        same = oldProps[keys[i]][k] === newProps[keys[i]][k];
+      }
+    } else {
+      // compare primitives
+      same = Object.is(oldProps[keys[i]], newProps[keys[i]]);
+    }
+
+    // something isn't the same, we should exit early
+    if (!same) {
+      break;
+    }
+  }
+  console.log(same);
+
+  return same;
+});
 
 export default function GradientBox (props: IGradientBoxOptional & IGradientBoxRequired): JSX.Element {
   // So long as borderWidth is less than borderRadius, the inside will have rounded borders
@@ -213,6 +231,7 @@ export default function GradientBox (props: IGradientBoxOptional & IGradientBoxR
           height: '100%',
           width: '100%',
           background: styles?.background,
+          // causes many emotion class names to be generated on resize
           backgroundSize: `${backgroundSize[0]}px ${backgroundSize[1]}px`
         }}
       >
