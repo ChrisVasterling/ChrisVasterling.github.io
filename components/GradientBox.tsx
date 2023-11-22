@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, styled } from '@mui/material';
 import React, { type CSSProperties, useEffect, useRef, useState } from 'react';
 
 interface IGradientBoxRequired {
@@ -61,19 +61,42 @@ function GradientBoxInnerCorner (props: {
     return <></>;
   }
 
+  // When the component is resized, maintain the same class name for unchanging styles
+  const Corner = styled('div', {
+    // pass all props to the div
+    shouldForwardProp: () => true
+  })({
+    width: `${innerRadius}px`,
+    height: `${innerRadius}px`,
+    maxWidth: `${minBackgroundDimension / 2}px`,
+    maxHeight: `${minBackgroundDimension / 2}px`,
+    background,
+    position: 'absolute',
+    visibility: hidden ? 'hidden' : 'visible',
+    ...cornerSpecificProps
+  });
+
   return (
-    <Box sx={{
-      width: `${innerRadius}px`,
-      height: `${innerRadius}px`,
-      maxWidth: `${minBackgroundDimension / 2}px`,
-      maxHeight: `${minBackgroundDimension / 2}px`,
-      background,
-      position: 'absolute',
-      backgroundSize: `${backgroundSize[0]}px ${backgroundSize[1]}px`,
-      visibility: hidden ? 'hidden' : 'visible',
-      ...cornerSpecificProps
-    }}/>
+    <Corner style={{
+      // For styles that could change often (such as on resize), add them to inline styles
+      backgroundSize: `${backgroundSize[0]}px ${backgroundSize[1]}px`
+    }} />
   );
+
+  // Potential problem, on resize many class names are generated and added to <head> because backgroundSize changes a lot
+  // return (
+  //   <Box sx={{
+  //     width: `${innerRadius}px`,
+  //     height: `${innerRadius}px`,
+  //     maxWidth: `${minBackgroundDimension / 2}px`,
+  //     maxHeight: `${minBackgroundDimension / 2}px`,
+  //     background,
+  //     position: 'absolute',
+  //     backgroundSize: `${backgroundSize[0]}px ${backgroundSize[1]}px`,
+  //     visibility: hidden ? 'hidden' : 'visible',
+  //     ...cornerSpecificProps
+  //   }}/>
+  // );
 }
 
 export default function GradientBox (props: IGradientBoxOptional & IGradientBoxRequired): JSX.Element {
