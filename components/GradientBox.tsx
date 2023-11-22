@@ -1,5 +1,5 @@
 import { Box, styled } from '@mui/material';
-import React, { type CSSProperties, useEffect, useRef, useState } from 'react';
+import React, { type CSSProperties, useEffect, useRef, useState, useMemo } from 'react';
 
 interface IGradientBoxRequired {
   children: JSX.Element | JSX.Element[] | string
@@ -61,26 +61,37 @@ function GradientBoxInnerCorner (props: {
     return <></>;
   }
 
-  // When the component is resized, maintain the same class name for unchanging styles
-  const Corner = styled('div', {
-    // pass all props to the div
-    shouldForwardProp: () => true
-  })({
-    width: `${innerRadius}px`,
-    height: `${innerRadius}px`,
-    maxWidth: `${minBackgroundDimension / 2}px`,
-    maxHeight: `${minBackgroundDimension / 2}px`,
-    background,
-    position: 'absolute',
-    visibility: hidden ? 'hidden' : 'visible',
-    ...cornerSpecificProps
-  });
+  // If props aren't changing, use a cached version of a corner
+  const Corner = useMemo(
+    () => {
+      // When the component is resized, maintain the same emotion class name for unchanging styles
+      return (
+        styled('div', {
+          // pass all props to the div
+          shouldForwardProp: () => true
+        })({
+          width: `${innerRadius}px`,
+          height: `${innerRadius}px`,
+          maxWidth: `${minBackgroundDimension / 2}px`,
+          maxHeight: `${minBackgroundDimension / 2}px`,
+          background,
+          position: 'absolute',
+          visibility: hidden ? 'hidden' : 'visible',
+          ...cornerSpecificProps
+        })
+      );
+    },
+    // Only generate new Corner if these specific prop values change
+    [innerRadius, minBackgroundDimension, hidden, background]
+  );
 
   return (
-    <Corner style={{
-      // For styles that could change often (such as on resize), add them to inline styles
-      backgroundSize: `${backgroundSize[0]}px ${backgroundSize[1]}px`
-    }} />
+    <Corner
+      style={{
+        // For styles that could change often (such as on resize), add them to inline styles
+        backgroundSize: `${backgroundSize[0]}px ${backgroundSize[1]}px`
+      }}
+    />
   );
 
   // Potential problem, on resize many class names are generated and added to <head> because backgroundSize changes a lot
@@ -152,8 +163,10 @@ export default function GradientBox (props: IGradientBoxOptional & IGradientBoxR
     };
   }, [handleWindowResize]);
 
-  const borderRadiuses = NormalizeToArray(styles?.borderRadius ?? 0, 4);
-  const borderWidths = NormalizeToArray(styles?.borderWidth ?? 0, 4);
+  const defaultBorderRadius = 5;
+  const defaultBorderWidth = 2;
+  const borderRadiuses = NormalizeToArray(styles?.borderRadius ?? defaultBorderRadius, 4);
+  const borderWidths = NormalizeToArray(styles?.borderWidth ?? defaultBorderWidth, 4);
   const innerRadiuses = borderRadiuses.map((radius: number, index: number) => {
     return Math.min(
       radius - borderWidths[index],
@@ -176,7 +189,8 @@ export default function GradientBox (props: IGradientBoxOptional & IGradientBoxR
   return (
     <Box
       sx={{
-        display: 'flex',
+        display: 'block',
+        alignSelf: 'baseline',
         overflow: 'hidden',
         borderTopLeftRadius: `${borderRadiuses[0]}px`,
         borderTopRightRadius: `${borderRadiuses[1]}px`,
@@ -189,6 +203,7 @@ export default function GradientBox (props: IGradientBoxOptional & IGradientBoxR
       <Box
         sx={{
           borderImage: gradient + ' ' + borderWidths.join(' '),
+          boxSizing: 'border-box',
           borderStyle: 'solid',
           borderTopWidth: `${borderWidths[0]}px`,
           borderRightWidth: `${borderWidths[1]}px`,
