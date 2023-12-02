@@ -123,7 +123,7 @@ const GradientBoxInnerCorner = memo(function GradientBoxInnerCorner (props: IGra
       break;
     }
   }
-  console.log(same);
+  // console.log(same);
 
   return same;
 });
@@ -199,7 +199,7 @@ export default function GradientBox (props: IGradientBoxOptional & IGradientBoxR
         container.current.offsetHeight
       ]);
       setMinBackgroundDimension(
-        Math.min(backgroundSize[0], backgroundSize[1])
+        Math.min(container.current.offsetWidth, container.current.offsetHeight)
       );
     }
   }, [container.current]);
@@ -214,7 +214,10 @@ export default function GradientBox (props: IGradientBoxOptional & IGradientBoxR
         borderTopRightRadius: `${borderRadiuses[1]}px`,
         borderBottomRightRadius: `${borderRadiuses[2]}px`,
         borderBottomLeftRadius: `${borderRadiuses[3]}px`,
-        margin: styles?.margin ?? '0px'
+        margin: styles?.margin ?? '0px',
+        // hacky solution to fix issue with inner corner appearing after parent is displayed
+        // by hiding until the parent has rendered (and got dimmensions) once
+        visibility: container.current === undefined ? 'hidden' : 'visible'
       }}
       ref={container}
     >
