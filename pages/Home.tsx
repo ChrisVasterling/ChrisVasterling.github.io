@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button, { ButtonTypes } from '../components/Button';
 import HeaderSpacing from '../components/HeaderSpacing';
+import GradientBox from '../components/GradientBox';
 
 export default function Home (props: any): JSX.Element {
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ export default function Home (props: any): JSX.Element {
 
         gradientBoxStyles={{
           borderWidth: 10,
-          borderRadius: 50
+          borderRadius: 1000
         }}
 
         styles={{
@@ -53,9 +54,23 @@ export default function Home (props: any): JSX.Element {
         }}
       >
         <span style={{ color: 'red' }}>Special Button (/projects)</span>
+        <br /><br /><br /><br /><br /><br /><br />
+        <span style={{ color: 'red' }}>Special Button (/projectsslkdjflsdkjflksdj)</span>
       </Button>
       <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-      <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+      <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+      <GradientBox
+        gradient={'radial-gradient(red, orange, yellow, green, blue)'}
+        styles={{
+          borderWidth: 3,
+          borderRadius: 0
+        }}
+      >
+        Hello
+      </GradientBox>
+      <br />
+      <div style={{ border: '3px solid black' }}>Hello</div>
+      <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
       <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
     </>
   );

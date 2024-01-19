@@ -1,27 +1,35 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 // import { useNavigate, useLocation } from 'react-router-dom';
 import Button, { ButtonTypes } from './Button';
 import { Box, Stack } from '@mui/material';
 import GradientText from './GradientText';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { DeviceSizeContext, DeviceTypes } from './App/App';
 
 export default function Layout (props: any): JSX.Element {
   const headerRef = useRef<HTMLDivElement>(null);
   const [scrollAtTop, setScrollAtTop] = useState<boolean>(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const device = useContext(DeviceSizeContext);
 
   const handleWindowScroll = (): void => {
     setScrollAtTop(window.scrollY === 0);
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (headerRef?.current !== null) {
       props.onHeaderHeight(headerRef.current.offsetHeight);
     }
-  }, [headerRef]);
+  }, [headerRef?.current]);
 
-  window.addEventListener('scroll', handleWindowScroll);
+  useEffect(() => {
+    window.addEventListener('scroll', handleWindowScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleWindowScroll);
+    };
+  }, []);
   // Disable the layout on specific pages
   // const location = useLocation();
   // if (location.pathname == "/about") {
@@ -43,7 +51,24 @@ export default function Layout (props: any): JSX.Element {
           zIndex: 100,
           transition: 'all 150ms ease-in-out',
           backdropFilter: 'blur(10px)',
-          boxShadow: `0px -5px 10px 0px ${scrollAtTop ? 'transparent' : 'black'}`
+          boxShadow: `0px -5px 10px 0px ${scrollAtTop ? 'transparent' : 'black'}`,
+          backgroundColor: () => {
+            // console.log(DeviceTypes[device]);
+            switch (device) {
+              case DeviceTypes.SmallMobile:
+                return 'gray';
+              case DeviceTypes.Mobile:
+                return 'red';
+              case DeviceTypes.Tablet:
+                return 'orange';
+              case DeviceTypes.Laptop:
+                return 'yellow';
+              case DeviceTypes.Desktop:
+                return 'green';
+              default:
+                return 'purple';
+            }
+          }
         }}
       >
         <Stack

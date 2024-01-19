@@ -1,5 +1,5 @@
 import { Box, styled } from '@mui/material';
-import React, { type CSSProperties, useEffect, useRef, useState, memo } from 'react';
+import React, { type CSSProperties, useEffect, useRef, useState, memo, useLayoutEffect } from 'react';
 
 interface IGradientBoxRequired {
   children: JSX.Element | JSX.Element[] | string
@@ -35,28 +35,28 @@ const GradientBoxInnerCorner = memo(function GradientBoxInnerCorner (props: IGra
   if (position === 'TL') {
     cornerSpecificProps = {
       backgroundPosition: `${-borderWidths[3]}px ${-borderWidths[0]}px`,
-      maskImage: `radial-gradient(${Math.min(minBackgroundDimension, 2 * innerRadius)}px circle at 100% 100%, transparent 50%, black 51%)`,
+      maskImage: `radial-gradient(${Math.min(minBackgroundDimension, 2 * innerRadius)}px circle at 100% 100%, transparent 50%, black 50.1%)`,
       top: '0px',
       left: '0px'
     };
   } else if (position === 'TR') {
     cornerSpecificProps = {
       backgroundPosition: `calc(100% + ${borderWidths[1]}px) ${-borderWidths[0]}px`,
-      maskImage: `radial-gradient(${Math.min(minBackgroundDimension, 2 * innerRadius)}px circle at 0% 100%, transparent 50%, black 51%)`,
+      maskImage: `radial-gradient(${Math.min(minBackgroundDimension, 2 * innerRadius)}px circle at 0% 100%, transparent 50%, black 50.1%)`,
       top: '0px',
       right: '0px'
     };
   } else if (position === 'BR') {
     cornerSpecificProps = {
       backgroundPosition: `calc(100% + ${borderWidths[1]}px) calc(100% + ${borderWidths[2]}px)`,
-      maskImage: `radial-gradient(${Math.min(minBackgroundDimension, 2 * innerRadius)}px circle at 0% 0%, transparent 50%, black 51%)`,
+      maskImage: `radial-gradient(${Math.min(minBackgroundDimension, 2 * innerRadius)}px circle at 0% 0%, transparent 50%, black 50.1%)`,
       bottom: '0px',
       right: '0px'
     };
   } else if (position === 'BL') {
     cornerSpecificProps = {
       backgroundPosition: `${-borderWidths[3]}px calc(100% + ${borderWidths[2]}px)`,
-      maskImage: `radial-gradient(${Math.min(minBackgroundDimension, 2 * innerRadius)}px circle at 100% 0%, transparent 50%, black 51%)`,
+      maskImage: `radial-gradient(${Math.min(minBackgroundDimension, 2 * innerRadius)}px circle at 100% 0%, transparent 50%, black 50.1%)`,
       bottom: '0px',
       left: '0px'
     };
@@ -82,28 +82,15 @@ const GradientBoxInnerCorner = memo(function GradientBoxInnerCorner (props: IGra
     <Corner
       style={{
         // For styles that could change often (such as on resize), add them to inline styles
+        // to prevent emotion from generating many new class names and updating the DOM
+        // more than necessary
         backgroundSize: `${backgroundSize[0]}px ${backgroundSize[1]}px`
       }}
     />
   );
-
-  // Potential problem, on resize many class names are generated and added to <head> because backgroundSize changes a lot
-  // return (
-  //   <Box sx={{
-  //     width: `${innerRadius}px`,
-  //     height: `${innerRadius}px`,
-  //     maxWidth: `${minBackgroundDimension / 2}px`,
-  //     maxHeight: `${minBackgroundDimension / 2}px`,
-  //     background,
-  //     position: 'absolute',
-  //     backgroundSize: `${backgroundSize[0]}px ${backgroundSize[1]}px`,
-  //     visibility: hidden ? 'hidden' : 'visible',
-  //     ...cornerSpecificProps
-  //   }}/>
-  // );
 }, (oldProps: IGradientBoxInnerCorner, newProps: IGradientBoxInnerCorner) => {
   // If props aren't changing, use a memoized version of a corner
-  // return true if the same, false if different
+  // return true if the props are the same, false if different
   let same = true;
 
   const keys = Object.keys(oldProps);
@@ -132,13 +119,15 @@ export default function GradientBox (props: IGradientBoxOptional & IGradientBoxR
   // So long as borderWidth is less than borderRadius, the inside will have rounded borders
   const { styles, gradient } = props;
 
-  const container = useRef<{ offsetHeight: number, offsetWidth: number }>();
+  const container = useRef<Element & { offsetHeight: number, offsetWidth: number }>();
+  const [backgroundSize, setBackgroundSize] = useState<number[]>([]);
 
-  const [backgroundSize, setBackgroundSize] = useState([0, 0]);
-  const [minBackgroundDimension, setMinBackgroundDimension] = useState<number>(0);
+  const GetMinBackgroundDimension = (): number => {
+    return Math.min(backgroundSize[0], backgroundSize[1]);
+  };
 
   const NormalizeToArray = (value: number | number[], size: number): number[] => {
-    // Could be expanded to turn [5, 10] into [5, 10, 5, 10] to offer more ease-of-use
+    // TODO: Could be expanded to turn [5, 10] into [5, 10, 5, 10] to offer more ease-of-use
 
     if (Array.isArray(value)) {
       // If already an array, return it
@@ -148,6 +137,17 @@ export default function GradientBox (props: IGradientBoxOptional & IGradientBoxR
       return new Array(size).fill(value, 0, size);
     }
   };
+
+  const defaultBorderRadius = 0;
+  const defaultBorderWidth = 1;
+  const borderRadiuses = NormalizeToArray(styles?.borderRadius ?? defaultBorderRadius, 4);
+  const borderWidths = NormalizeToArray(styles?.borderWidth ?? defaultBorderWidth, 4);
+  const innerRadiuses = borderRadiuses.map((radius: number, index: number) => {
+    return Math.min(
+      radius - borderWidths[index],
+      GetMinBackgroundDimension() / 2 - borderWidths[index]
+    );
+  });
 
   const HideInnerRadius = (index: number): boolean => {
     // Handled edge cases where the inner radius needs to be hidden
@@ -159,50 +159,41 @@ export default function GradientBox (props: IGradientBoxOptional & IGradientBoxR
     );
   };
 
-  const handleWindowResize = (event: Event): void => {
-    // box contents may have wrapped on a window resize
-    if (container.current !== undefined) {
-      if (container.current.offsetWidth !== backgroundSize[0] ||
-          container.current.offsetHeight !== backgroundSize[1]) {
-        // As a result of resize, one of the dimensions changed so update it
-        setBackgroundSize([
-          container.current.offsetWidth,
-          container.current.offsetHeight
-        ]);
-      }
+  const handleContainerResize = (entries: any): any => {
+    // may need to adjust inner corners
+    // when the element size changes
+    // Should only ever be 1 entry
+    for (const entry of entries) {
+      setBackgroundSize([
+        entry.contentRect.width,
+        entry.contentRect.height
+      ]);
     }
   };
 
   useEffect(() => {
-    window.addEventListener('resize', handleWindowResize);
-
+    // Observe any changes to the element size
+    const ro = new ResizeObserver(handleContainerResize);
+    ro.observe(container?.current ?? new Element());
     return () => {
-      window.removeEventListener('resize', handleWindowResize);
+      ro.disconnect();
     };
-  }, [handleWindowResize]);
-
-  const defaultBorderRadius = 5;
-  const defaultBorderWidth = 2;
-  const borderRadiuses = NormalizeToArray(styles?.borderRadius ?? defaultBorderRadius, 4);
-  const borderWidths = NormalizeToArray(styles?.borderWidth ?? defaultBorderWidth, 4);
-  const innerRadiuses = borderRadiuses.map((radius: number, index: number) => {
-    return Math.min(
-      radius - borderWidths[index],
-      minBackgroundDimension / 2 - borderWidths[index]
-    );
-  });
-
-  useEffect(() => {
-    if (container.current !== undefined) {
-      setBackgroundSize([
-        container.current.offsetWidth,
-        container.current.offsetHeight
-      ]);
-      setMinBackgroundDimension(
-        Math.min(container.current.offsetWidth, container.current.offsetHeight)
-      );
-    }
   }, [container.current]);
+
+  // Slow performance / rendering to see how / when the corners load
+  // const now = performance.now();
+  // while (performance.now() - now < 100) { continue; }
+
+  useLayoutEffect(() => {
+    /**
+     * need to know the layout dimmensions before initial render
+     * to ensure inner corners are styled correctly the first render
+     */
+    setBackgroundSize([
+      container?.current?.offsetWidth ?? 0,
+      container?.current?.offsetHeight ?? 0
+    ]);
+  }, []);
 
   return (
     <Box
@@ -214,10 +205,7 @@ export default function GradientBox (props: IGradientBoxOptional & IGradientBoxR
         borderTopRightRadius: `${borderRadiuses[1]}px`,
         borderBottomRightRadius: `${borderRadiuses[2]}px`,
         borderBottomLeftRadius: `${borderRadiuses[3]}px`,
-        margin: styles?.margin ?? '0px',
-        // hacky solution to fix issue with inner corner appearing after parent is displayed
-        // by hiding until the parent has rendered (and got dimmensions) once
-        visibility: container.current === undefined ? 'hidden' : 'visible'
+        margin: styles?.margin ?? '0px'
       }}
       ref={container}
     >
@@ -241,16 +229,14 @@ export default function GradientBox (props: IGradientBoxOptional & IGradientBoxR
         <Box>
           {props.children}
         </Box>
-        {/* Only display when the box dimmensions are available */}
-        {container.current !== undefined && (
-          <Box>
+        <Box>
             {['TL', 'TR', 'BR', 'BL'].map((pos, index) => {
               return (
                 <GradientBoxInnerCorner
                   key={index}
                   background={gradient}
                   innerRadius={innerRadiuses[index]}
-                  minBackgroundDimension={minBackgroundDimension}
+                  minBackgroundDimension={GetMinBackgroundDimension()}
                   backgroundSize={backgroundSize}
                   borderWidths={borderWidths}
                   position={pos}
@@ -259,7 +245,6 @@ export default function GradientBox (props: IGradientBoxOptional & IGradientBoxR
               );
             })}
           </Box>
-        )}
       </Box>
     </Box>
   );

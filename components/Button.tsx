@@ -86,7 +86,7 @@ export default function Button (props: IButton): JSX.Element {
       >
         <Box
           sx={{
-            display: 'inline-block',
+            display: 'block',
             padding: '5px', // default value
             '&& .MuiTouchRipple-rippleVisible': {
               animationDuration: `${rippleDuration}ms`
@@ -98,9 +98,9 @@ export default function Button (props: IButton): JSX.Element {
             ...styles
           }}
         >
-          <div style={{ position: 'relative', zIndex: 1 }}>
+          <Box sx={{ position: 'relative', zIndex: 1 }}>
             {props.children}
-          </div>
+          </Box>
           <TouchRipple ref={touchRippleRef} />
         </Box>
       </GradientBox>
