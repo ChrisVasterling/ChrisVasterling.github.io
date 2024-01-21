@@ -1,35 +1,36 @@
-import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 // import { useNavigate, useLocation } from 'react-router-dom';
 import Button, { ButtonTypes } from './Button';
 import { Box, Stack } from '@mui/material';
 import GradientText from './GradientText';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { DeviceSizeContext, DeviceTypes } from './App/App';
+import useScroll from '../hooks/useScroll';
 
 export default function Layout (props: any): JSX.Element {
   const headerRef = useRef<HTMLDivElement>(null);
-  const [scrollAtTop, setScrollAtTop] = useState<boolean>(true);
+  const scrollInfo = useScroll();
   const navigate = useNavigate();
   const location = useLocation();
   const device = useContext(DeviceSizeContext);
 
-  const handleWindowScroll = (): void => {
-    setScrollAtTop(window.scrollY === 0);
+  const handleHeaderResize = (entries: any): any => {
+    for (const entry of entries) {
+      props.onHeaderHeight(entry.contentRect.height);
+    }
   };
 
-  useLayoutEffect(() => {
-    if (headerRef?.current !== null) {
-      props.onHeaderHeight(headerRef.current.offsetHeight);
-    }
-  }, [headerRef?.current]);
-
   useEffect(() => {
-    window.addEventListener('scroll', handleWindowScroll);
-
+    // if (headerRef?.current !== null) {
+    //   props.onHeaderHeight(headerRef.current.offsetHeight);
+    // }
+    const ro = new ResizeObserver(handleHeaderResize);
+    ro.observe(headerRef?.current ?? new Element());
     return () => {
-      window.removeEventListener('scroll', handleWindowScroll);
+      ro.disconnect();
     };
-  }, []);
+  }, [headerRef.current]);
+
   // Disable the layout on specific pages
   // const location = useLocation();
   // if (location.pathname == "/about") {
@@ -43,15 +44,13 @@ export default function Layout (props: any): JSX.Element {
       <Box
         ref={headerRef}
         sx={{
-          py: scrollAtTop ? '15px' : '5px',
           position: 'fixed',
           top: 0,
           left: 0,
           width: '100%',
           zIndex: 100,
-          transition: 'all 150ms ease-in-out',
           backdropFilter: 'blur(10px)',
-          boxShadow: `0px -5px 10px 0px ${scrollAtTop ? 'transparent' : 'black'}`,
+          boxShadow: `0px -5px 10px 0px ${scrollInfo.position[1] === 0 ? 'transparent' : 'black'}`,
           backgroundColor: () => {
             // console.log(DeviceTypes[device]);
             switch (device) {
@@ -74,6 +73,8 @@ export default function Layout (props: any): JSX.Element {
         <Stack
           direction={'row'}
           sx={{
+            py: scrollInfo.position[1] > 0 ? `${Math.max(5, 15 - scrollInfo.position[1])}px` : '15px',
+            transition: `all ${scrollInfo.direction === 'up' ? 0 : 150}ms ease-in-out`,
             px: '15%',
             alignItems: 'center'
           }}
