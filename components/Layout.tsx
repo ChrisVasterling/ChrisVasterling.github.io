@@ -9,7 +9,7 @@ import useScroll from '../hooks/useScroll';
 
 export default function Layout (props: any): JSX.Element {
   const headerRef = useRef<HTMLDivElement>(null);
-  const scrollInfo = useScroll();
+  const scrollInfo = useScroll({ sensitivity: 100 });
   const navigate = useNavigate();
   const location = useLocation();
   const device = useContext(DeviceSizeContext);
@@ -45,14 +45,21 @@ export default function Layout (props: any): JSX.Element {
         ref={headerRef}
         sx={{
           position: 'fixed',
-          top: 0,
+          top: (
+            headerRef.current?.offsetHeight === null || scrollInfo.sensitive.position[1] === 0
+              ? 0
+              : `${scrollInfo.sensitive.direction === 'up' ? 0 : (headerRef.current?.offsetHeight ?? 0) * -1 - 1}px`
+          ),
+          transform: 'translate3d(0px, 0px, 0px)',
+          transition: 'all 200ms ease-in-out',
           left: 0,
           width: '100%',
           zIndex: 100,
           backdropFilter: 'blur(10px)',
-          boxShadow: `0px -5px 10px 0px ${scrollInfo.position[1] === 0 ? 'transparent' : 'black'}`,
+          // boxShadow: `0px -5px 10px 0px ${scrollInfo.position[1] === 0 ? 'transparent' : 'black'}`,
           backgroundColor: () => {
             // console.log(DeviceTypes[device]);
+            // return 'transparent';
             switch (device) {
               case DeviceTypes.SmallMobile:
                 return 'gray';
@@ -73,8 +80,18 @@ export default function Layout (props: any): JSX.Element {
         <Stack
           direction={'row'}
           sx={{
-            py: scrollInfo.position[1] > 0 ? `${Math.max(5, 15 - scrollInfo.position[1])}px` : '15px',
-            transition: `all ${scrollInfo.direction === 'up' ? 0 : 150}ms ease-in-out`,
+            // Overall behavior is good. Seed to adjust logic for the py here
+            // Currently the scroll behavior is a bit jaring.
+            // Probably because adjusting the PY changes the element size making the entire page shift slightly.
+            // the PY is also always determined by the scroll position
+            /**
+             * Desired behavior:
+             * scroll down and header disappears
+             * scroll back up and header is slimmer
+             * scroll to the top and header is full size
+             */
+            py: '15px', // scrollInfo.position[1] > 0 ? `${Math.max(5, 15 - scrollInfo.position[1]) * 0 + 5}px` : '15px',
+            transition: `all 200ms ease-in-out ${200}ms`,
             px: '15%',
             alignItems: 'center'
           }}
